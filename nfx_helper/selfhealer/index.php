@@ -1,9 +1,22 @@
 <?php 
+
+/**
+ * nfx:MEDIA Self Healder
+ *
+ * @link http://www.nfxmedia.de
+ * @copyright Copyright (c) 2014, nfx:MEDIA
+ * @author nf, ma - info@nfxmedia.de;
+ * @package nfxMEDIA
+ * @subpackage Shopware Helper
+ * @version 1.0.0 initial release of the plugin 
+ */
+
+
 error_reporting(E_ALL);
 DEFINE("LAST_RUN_FILE","lastrun.txt");
 DEFINE("LOG_FILE","log.txt");
 DEFINE("FROM_EMAIL","support@nfxmedia.de");
-DEFINE("TO_EMAIL","cron_debug@nfxmedia.de");
+DEFINE("TO_EMAIL","cron_debug@nfxmedia.de"); // to show us, if there are real problems with one of our cronjobs. Feel free to replace it with yours
 DEFINE("SUBJECT","Cron Check Warning");
 
 $db = include('../../config.php');
