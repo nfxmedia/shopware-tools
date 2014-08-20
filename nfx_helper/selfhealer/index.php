@@ -52,7 +52,7 @@ if(file_exists(LAST_RUN_FILE)){
 // get the list of all installed cronjobs
 $arr_msg = array();
 $text_last = "";
-$sql = "SELECT name, active, start, end, next, elementID FROM s_crontab WHERE name LIKE '%nfx%'";
+$sql = "SELECT name, active, start, end, next, elementID FROM s_crontab WHERE name LIKE '%nfx%' OR action LIKE '%nfx%'";
 mysql_select_db($DB_DATABASE , $con);
 
 	$result=mysql_query($sql);
