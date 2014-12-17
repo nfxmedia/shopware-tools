@@ -38,6 +38,8 @@ if (!$con) {
     echo "Database connection successfully established.<br />";
 }
 
+removeOldFiles();
+
 // get the status of the cronjobs from previous run
 $arr_last = array();
 if (file_exists(LAST_RUN_FILE)) {
