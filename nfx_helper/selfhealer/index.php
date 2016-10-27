@@ -30,10 +30,11 @@ chmod(dirname(__FILE__), 0755);
 //connect to database
 echo "Connecting to database...<br /> ";
 
-$con = mysql_connect($DB_HOST . ":" . $DB_PORT, $DB_USER, $DB_PASSWORD);
+//$con = mysql_connect($DB_HOST . ":" . $DB_PORT, $DB_USER, $DB_PASSWORD);
+$conn = new mysqli($DB_HOST . ":" . $DB_PORT, $DB_USER, $DB_PASSWORD, $DB_DATABASE);
 
-if (!$con) {
-    die("Failed to connect to database: " . mysql_error());
+if ($conn->connect_errno) {
+    die("Failed to connect to database: " . $conn->connect_error);
 } else {
     echo "Database connection successfully established.<br />";
 }
@@ -52,41 +53,49 @@ if (file_exists(LAST_RUN_FILE)) {
 // get the list of all installed cronjobs
 $arr_msg = array();
 $text_last = "";
-$sql = "SELECT name, active, start, end, next, elementID FROM s_crontab WHERE name LIKE '%nfx%' OR action LIKE '%nfx%'";
-mysql_select_db($DB_DATABASE, $con);
+$sql = "SELECT name, active, start, end, next, elementID FROM s_crontab WHERE name LIKE '%nfx%' OR action LIKE '%nfx%' OR name LIKE '%sagepay%'";
+//mysql_select_db($DB_DATABASE, $con);
 
-$result = mysql_query($sql);
+//$result = mysql_query($sql);
+$result = $conn->query($sql);
+$num_rows = $result->num_rows;
 
-while ($row = mysql_fetch_assoc($result)) {
-    $msg = "Name: " . $row["name"] . "; Active: " . $row["active"] . "; Start: " . $row["start"] . ";";
-    $msg .= " End: " . $row["end"] . "; Next: " . $row["next"] . "; elementID: " . $row["elementID"] . ";";
-    $text_last .= $row["name"] . "\t" . $row["active"] . "\t" . $row["start"] . "\t" . $row["end"] . "\t" . $row["next"] . "\t" . $row["elementID"] . "\r\n";
-    logMessage(LOG_FILE, $msg);
-    $active = $row["active"];
-    if ($active) {
-        if (!$row["end"]) {
-            //check previous message
-            foreach ($arr_last as $cron) {
-                if ($row["name"] == $cron[0]) {
-                    //"end" is empty and the cron status is not changes since last run => there is something wrong
-                    $active = !(($row["active"] == $cron[1]) && ($row["start"] == $cron[2]) && ($row["end"] == $cron[3]) &&
-                            ($row["next"] == $cron[4]) && ($row["elementID"] == $cron[5]));
-                    break;
+if($num_rows){
+    $row = $result->fetch_assoc();
+    //while ($row = mysql_fetch_assoc($result)) {
+    while ($row) {
+        $msg = "Name: " . $row["name"] . "; Active: " . $row["active"] . "; Start: " . $row["start"] . ";";
+        $msg .= " End: " . $row["end"] . "; Next: " . $row["next"] . "; elementID: " . $row["elementID"] . ";";
+        $text_last .= $row["name"] . "\t" . $row["active"] . "\t" . $row["start"] . "\t" . $row["end"] . "\t" . $row["next"] . "\t" . $row["elementID"] . "\r\n";
+        logMessage(LOG_FILE, $msg);
+        $active = $row["active"];
+        if ($active) {
+            if (!$row["end"]) {
+                //check previous message
+                foreach ($arr_last as $cron) {
+                    if ($row["name"] == $cron[0]) {
+                        //"end" is empty and the cron status is not changes since last run => there is something wrong
+                        $active = !(($row["active"] == $cron[1]) && ($row["start"] == $cron[2]) && ($row["end"] == $cron[3]) &&
+                                ($row["next"] == $cron[4]) && ($row["elementID"] == $cron[5]));
+                        break;
+                    }
                 }
             }
         }
-    }
-    if (!$active) {
-        $sql = "UPDATE s_crontab
-		SET active = 1,
-			end = NOW(),
-			next = NOW()
-		WHERE name LIKE '" . $row["name"] . "'";
-        mysql_query($sql);
-        $arr_msg[] = $msg;
-        logMessage(LOG_FILE, "--- reactivated");
-    } else {
-        logMessage(LOG_FILE, "--- ok");
+        if (!$active) {
+            $sql = "UPDATE s_crontab
+                    SET active = 1,
+                            end = NOW(),
+                            next = NOW()
+                    WHERE name LIKE '" . $row["name"] . "'";
+            //mysql_query($sql);
+            $conn->query($sql);
+            $arr_msg[] = $msg;
+            logMessage(LOG_FILE, "--- reactivated");
+        } else {
+            logMessage(LOG_FILE, "--- ok");
+        }
+        $row = $result->fetch_assoc();
     }
 }
 
