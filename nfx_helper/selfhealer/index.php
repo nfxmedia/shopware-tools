@@ -30,8 +30,11 @@ chmod(dirname(__FILE__), 0755);
 //connect to database
 echo "Connecting to database...<br /> ";
 
+if($DB_PORT){
+    $DB_HOST .= ":" . $DB_PORT;
+}
 //$con = mysql_connect($DB_HOST . ":" . $DB_PORT, $DB_USER, $DB_PASSWORD);
-$conn = new mysqli($DB_HOST . ":" . $DB_PORT, $DB_USER, $DB_PASSWORD, $DB_DATABASE);
+$conn = new mysqli($DB_HOST, $DB_USER, $DB_PASSWORD, $DB_DATABASE);
 
 if ($conn->connect_errno) {
     die("Failed to connect to database: " . $conn->connect_error);
