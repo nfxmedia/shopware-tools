@@ -12,13 +12,13 @@
  * @version 1.0.1 improve logging 
  */
 error_reporting(E_ALL);
-DEFINE("LAST_RUN_FILE", "lastrun.txt");
+DEFINE("LAST_RUN_FILE", dirname(__FILE__) . "/" . "lastrun.txt");
 DEFINE("LOG_FILE", "log<>.txt");
 DEFINE("FROM_EMAIL", "support@nfxmedia.de");
 DEFINE("TO_EMAIL", "cron_debug@nfxmedia.de"); // to show us, if there are real problems with one of our cronjobs. Feel free to replace it with yours
 DEFINE("SUBJECT", "Cron Check Warning");
 
-$db = include('../../config.php');
+$db = include(realpath(dirname(__FILE__) . '/../../') . '/config.php');
 $DB_HOST = $db["db"]["host"];
 $DB_PORT = $db["db"]["port"];
 $DB_USER = $db["db"]["username"];
@@ -79,7 +79,7 @@ if($num_rows){
                     if ($row["name"] == $cron[0]) {
                         //"end" is empty and the cron status is not changes since last run => there is something wrong
                         $active = !(($row["active"] == $cron[1]) && ($row["start"] == $cron[2]) && ($row["end"] == $cron[3]) &&
-                                ($row["next"] == $cron[4]) && ($row["elementID"] == $cron[5]));
+                                ($row["next"] == $cron[4]) && ($row["elementID"] == $cron[5]));                        
                         break;
                     }
                 }
