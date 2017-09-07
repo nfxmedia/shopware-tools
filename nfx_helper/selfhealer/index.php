@@ -12,7 +12,7 @@
  * @version 1.0.1 improve logging 
  */
 error_reporting(E_ALL);
-DEFINE("LAST_RUN_FILE", dirname(__FILE__) . "/" . "lastrun.txt");
+DEFINE("LAST_RUN_FILE", "lastrun.txt");
 DEFINE("LOG_FILE", "log<>.txt");
 DEFINE("FROM_EMAIL", "support@nfxmedia.de");
 DEFINE("TO_EMAIL", "cron_debug@nfxmedia.de"); // to show us, if there are real problems with one of our cronjobs. Feel free to replace it with yours
@@ -46,8 +46,8 @@ removeOldFiles();
 
 // get the status of the cronjobs from previous run
 $arr_last = array();
-if (file_exists(LAST_RUN_FILE)) {
-    $text = file_get_contents(LAST_RUN_FILE);
+if (file_exists(dirname(__FILE__) . "/" . LAST_RUN_FILE)) {
+    $text = file_get_contents(dirname(__FILE__) . "/" . LAST_RUN_FILE);
     $lines = explode("\r\n", $text);
     foreach ($lines as $line) {
         $arr_last[] = explode("\t", $line);
